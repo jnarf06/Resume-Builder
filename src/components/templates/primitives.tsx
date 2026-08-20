@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
-import type { Resume } from "@/lib/types";
+import type { Resume, SectionId, Skill } from "@/lib/types";
 import { FONT_STACKS, GLYPH, SPACING, type Tokens } from "@/lib/templates/types";
 
 export type Ctx = { r: Resume; t: Tokens };
@@ -28,20 +28,6 @@ export const tint = (hex: string, alpha: number) => {
   return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${alpha})`;
 };
 
-/**
- * Skills and languages may carry a level: "Google Ads | 4", "Excel | 80",
- * "English | 4/5". Levels are optional — a plain line just renders as text,
- * which is what the ATS-safe templates want anyway.
- */
-export function parseLevel(raw: string): { label: string; level: number | null } {
-  const m = raw.match(/^(.*?)\s*\|\s*(\d{1,3})\s*(?:\/\s*(\d{1,3}))?\s*$/);
-  if (!m) return { label: raw.trim(), level: null };
-  const value = Number(m[2]);
-  const outOf = m[3] ? Number(m[3]) : value > 5 ? 100 : 5;
-  const pct = Math.max(0, Math.min(1, value / (outOf || 1)));
-  return { label: m[1].trim(), level: pct };
-}
-
 /** Words people actually write in the language Level field, as a proportion. */
 const WORD_LEVELS: Record<string, number> = {
   native: 1,
@@ -58,7 +44,10 @@ const WORD_LEVELS: Record<string, number> = {
 export function wordLevel(value: string): number | null {
   const key = value.trim().toLowerCase();
   if (WORD_LEVELS[key] !== undefined) return WORD_LEVELS[key];
-  return parseLevel(`x | ${value}`).level;
+  // Also accept a bare number, so "4" or "80" in the Level field still works.
+  const n = Number(key.replace("%", ""));
+  if (!key || Number.isNaN(n)) return null;
+  return Math.max(0, Math.min(1, n > 5 ? n / 100 : n / 5));
 }
 
 /* -------------------------------------------------------------------------- */
@@ -242,20 +231,38 @@ export function SectionHead({ t, index, children }: { t: Tokens; index?: number;
   }
 }
 
+/**
+ * A section, optionally carrying its own heading colour.
+ *
+ * Pass `r` and `id` and the heading picks up `settings.sectionColors[id]`,
+ * falling back to the accent. Only the heading and its decoration recolour —
+ * the body stays on the document palette, which is what keeps a resume with
+ * several section colours from looking like a ransom note.
+ *
+ * Deliberately prop-driven rather than context-driven: the marketing homepage
+ * renders these templates as a server component, and React context would drag
+ * the whole template tree into the client bundle.
+ */
 export function Section({
+  r,
+  id,
   t,
   title,
   index,
   children,
 }: {
+  r?: Resume;
+  id?: SectionId;
   t: Tokens;
   title: string;
   index?: number;
   children: ReactNode;
 }) {
+  const custom = r && id ? r.settings.sectionColors?.[id] : undefined;
+  const headTokens = custom ? { ...t, accent: custom } : t;
   return (
     <section style={{ marginBottom: sectionGap(t) }}>
-      <SectionHead t={t} index={index}>
+      <SectionHead t={headTokens} index={index}>
         {title}
       </SectionHead>
       {children}
@@ -441,9 +448,8 @@ export function Summary({ r }: Ctx) {
   return <p className="text-justify">{r.basics.summary}</p>;
 }
 
-function SkillRow({ t, raw }: { t: Tokens; raw: string }) {
-  const { label, level } = parseLevel(raw);
-  const showMeter = t.meter !== "none" && level !== null;
+function SkillRow({ t, skill }: { t: Tokens; skill: Skill }) {
+  const showMeter = t.meter !== "none" && skill.level !== null;
   return (
     <li
       className={showMeter ? "flex items-center justify-between" : "flex"}
@@ -451,9 +457,9 @@ function SkillRow({ t, raw }: { t: Tokens; raw: string }) {
     >
       <span className="flex min-w-0">
         <Bullet t={t} />
-        <span>{label}</span>
+        <span>{skill.name}</span>
       </span>
-      {showMeter && <Meter t={t} value={level} />}
+      {showMeter && <Meter t={t} value={(skill.level as number) / 5} />}
     </li>
   );
 }
@@ -463,14 +469,14 @@ export function Skills({ r, t }: Ctx) {
   if (t.skillsInline) {
     return (
       <p style={{ fontSize: "0.96em" }}>
-        {r.skills.filter(Boolean).map((s) => parseLevel(s).label).join("  ·  ")}
+        {r.skills.filter((s) => s.name.trim()).map((s) => s.name).join("  ·  ")}
       </p>
     );
   }
   return (
     <ul style={{ fontSize: "0.96em" }}>
-      {r.skills.filter(Boolean).map((s, i) => (
-        <SkillRow key={i} t={t} raw={s} />
+      {r.skills.filter((s) => s.name.trim()).map((s) => (
+        <SkillRow key={s.id} t={t} skill={s} />
       ))}
     </ul>
   );
@@ -482,8 +488,8 @@ export function SkillsGrid({ r, t }: Ctx) {
   if (t.skillsInline) return <Skills r={r} t={t} />;
   return (
     <ul className="grid grid-cols-2 gap-x-[1.8em]" style={{ fontSize: "0.96em" }}>
-      {r.skills.filter(Boolean).map((s, i) => (
-        <SkillRow key={i} t={t} raw={s} />
+      {r.skills.filter((s) => s.name.trim()).map((s) => (
+        <SkillRow key={s.id} t={t} skill={s} />
       ))}
     </ul>
   );
@@ -657,26 +663,26 @@ export function SideSections({ r, t, from = 1 }: Ctx & { from?: number }) {
   let n = from;
   return (
     <>
-      <Section t={t} title="Contact" index={n++}>
+      <Section r={r} id="contact" t={t} title="Contact" index={n++}>
         <Contact r={r} t={t} />
       </Section>
       {r.skills.length > 0 && (
-        <Section t={t} title="Skills" index={n++}>
+        <Section r={r} id="skills" t={t} title="Skills" index={n++}>
           <Skills r={r} t={t} />
         </Section>
       )}
       {r.languages.length > 0 && (
-        <Section t={t} title="Languages" index={n++}>
+        <Section r={r} id="languages" t={t} title="Languages" index={n++}>
           <Languages r={r} t={t} />
         </Section>
       )}
       {r.education.length > 0 && (
-        <Section t={t} title="Education" index={n++}>
+        <Section r={r} id="education" t={t} title="Education" index={n++}>
           <Education r={r} t={t} />
         </Section>
       )}
       {r.settings.showReferences && r.references.length > 0 && (
-        <Section t={t} title="References" index={n++}>
+        <Section r={r} id="references" t={t} title="References" index={n++}>
           <References r={r} t={t} />
         </Section>
       )}

@@ -1,4 +1,4 @@
-import type { Resume } from "./types";
+import type { Resume, Skill } from "./types";
 import { uid } from "./types";
 import { SAMPLE, BLANK } from "./seed";
 
@@ -58,12 +58,44 @@ const LEGACY_TEMPLATES: Record<string, string> = {
   ats: "manila-plain",
 };
 
-function migrate(r: Resume): Resume {
-  const mapped = LEGACY_TEMPLATES[r.settings?.template];
-  if (!mapped) return r;
-  // The old accent was a user choice on a template that had none of its own;
-  // clearing it lets the new template's palette come through.
-  return { ...r, settings: { ...r.settings, template: mapped, accent: "" } };
+/** Old shape: "Google Ads | 4". New shape: { name, level }. */
+function migrateSkill(raw: unknown): Skill {
+  if (raw && typeof raw === "object" && "name" in raw) {
+    const s = raw as Partial<Skill>;
+    return { id: s.id ?? uid(), name: s.name ?? "", level: s.level ?? null };
+  }
+  const text = String(raw ?? "");
+  const m = text.match(/^(.*?)\s*\|\s*(\d{1,3})\s*(?:\/\s*(\d{1,3}))?\s*$/);
+  if (!m) return { id: uid(), name: text.trim(), level: null };
+  const value = Number(m[2]);
+  const outOf = m[3] ? Number(m[3]) : value > 5 ? 100 : 5;
+  return { id: uid(), name: m[1].trim(), level: Math.max(1, Math.round((value / outOf) * 5)) };
+}
+
+/**
+ * Brings any previously saved, imported or shared resume up to the current
+ * shape. Anything reaching the app from outside goes through here.
+ */
+export function migrate(r: Resume): Resume {
+  const settings = { ...r.settings };
+
+  // v1 shipped two hard-coded template ids; map them onto the catalogue rather
+  // than silently falling back to the default and losing the choice.
+  const mapped = LEGACY_TEMPLATES[settings.template];
+  if (mapped) {
+    settings.template = mapped;
+    settings.accent = "";
+  }
+
+  // v2 had a single `accent` string; colours are per-role now.
+  if (!settings.colors) settings.colors = settings.accent ? { accent: settings.accent } : {};
+  if (!settings.sectionColors) settings.sectionColors = {};
+
+  return {
+    ...r,
+    settings,
+    skills: Array.isArray(r.skills) ? r.skills.map(migrateSkill) : [],
+  };
 }
 
 /** A copy with a fresh id and name, ready to add to the library. */
@@ -168,7 +200,7 @@ export async function importJson(file: File): Promise<Resume> {
   const text = await file.text();
   const data = JSON.parse(text) as Resume;
   if (!data || typeof data !== "object" || !data.basics) throw new Error("Not a resume file");
-  return { ...data, id: uid(), updatedAt: Date.now() };
+  return migrate({ ...data, id: uid(), updatedAt: Date.now() });
 }
 
 /**

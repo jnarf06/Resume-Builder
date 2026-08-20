@@ -56,12 +56,12 @@ export function WaveEngine({ r, t }: EngineProps) {
         </aside>
         <main className="flex-1">
           {r.basics.summary && (
-            <Section t={t} title="About Me" index={1}>
+            <Section r={r} id="profile" t={t} title="About Me" index={1}>
               <Summary r={r} t={t} />
             </Section>
           )}
           {r.experience.length > 0 && (
-            <Section t={t} title="Experience" index={2}>
+            <Section r={r} id="experience" t={t} title="Experience" index={2}>
               <Experience r={r} t={t} />
             </Section>
           )}
@@ -96,7 +96,7 @@ export function ModularEngine({ r, t }: EngineProps) {
 
       {r.basics.summary && (
         <div style={block(false)}>
-          <Section t={t} title="About Me" index={1}>
+          <Section r={r} id="profile" t={t} title="About Me" index={1}>
             <Summary r={r} t={t} />
           </Section>
         </div>
@@ -105,14 +105,14 @@ export function ModularEngine({ r, t }: EngineProps) {
       <div className="grid grid-cols-2 gap-[0.9em]">
         {r.education.length > 0 && (
           <div className="avoid-break" style={block(false)}>
-            <Section t={t} title="Education" index={2}>
+            <Section r={r} id="education" t={t} title="Education" index={2}>
               <Education r={r} t={t} />
             </Section>
           </div>
         )}
         {r.skills.length > 0 && (
           <div className="avoid-break" style={block(false)}>
-            <Section t={t} title="Skills" index={3}>
+            <Section r={r} id="skills" t={t} title="Skills" index={3}>
               <Skills r={r} t={t} />
             </Section>
           </div>
@@ -121,7 +121,7 @@ export function ModularEngine({ r, t }: EngineProps) {
 
       {r.experience.length > 0 && (
         <div style={block(false)}>
-          <Section t={t} title="Experience" index={4}>
+          <Section r={r} id="experience" t={t} title="Experience" index={4}>
             <Experience r={r} t={t} />
           </Section>
         </div>
@@ -130,14 +130,14 @@ export function ModularEngine({ r, t }: EngineProps) {
       <div className="grid grid-cols-2 gap-[0.9em]">
         {r.languages.length > 0 && (
           <div className="avoid-break" style={block(false)}>
-            <Section t={t} title="Languages" index={5}>
+            <Section r={r} id="languages" t={t} title="Languages" index={5}>
               <Languages r={r} t={t} />
             </Section>
           </div>
         )}
         {r.settings.showReferences && r.references.length > 0 && (
           <div className="avoid-break" style={block(false)}>
-            <Section t={t} title="References" index={6}>
+            <Section r={r} id="references" t={t} title="References" index={6}>
               <References r={r} t={t} />
             </Section>
           </div>
@@ -167,12 +167,12 @@ export function EditorialEngine({ r, t }: EngineProps) {
       <div className="flex gap-[1.8em]">
         <main className="flex-1">
           {r.basics.summary && (
-            <Section t={t} title="Profile" index={1}>
+            <Section r={r} id="profile" t={t} title="Profile" index={1}>
               <Summary r={r} t={t} />
             </Section>
           )}
           {r.experience.length > 0 && (
-            <Section t={t} title="Work Experience" index={2}>
+            <Section r={r} id="experience" t={t} title="Work Experience" index={2}>
               <Experience r={r} t={t} />
             </Section>
           )}
@@ -184,22 +184,22 @@ export function EditorialEngine({ r, t }: EngineProps) {
             </div>
           )}
           {r.education.length > 0 && (
-            <Section t={t} title="Education" index={3}>
+            <Section r={r} id="education" t={t} title="Education" index={3}>
               <Education r={r} t={t} />
             </Section>
           )}
           {r.skills.length > 0 && (
-            <Section t={t} title="Key Skills" index={4}>
+            <Section r={r} id="skills" t={t} title="Key Skills" index={4}>
               <Skills r={r} t={t} />
             </Section>
           )}
           {r.languages.length > 0 && (
-            <Section t={t} title="Languages" index={5}>
+            <Section r={r} id="languages" t={t} title="Languages" index={5}>
               <Languages r={r} t={t} />
             </Section>
           )}
           {r.settings.showReferences && r.references.length > 0 && (
-            <Section t={t} title="References" index={6}>
+            <Section r={r} id="references" t={t} title="References" index={6}>
               <References r={r} t={t} />
             </Section>
           )}
@@ -251,35 +251,35 @@ export function MemphisEngine({ r, t }: EngineProps) {
       <div className="relative grid grid-cols-2 gap-x-[2em]">
         {r.basics.summary && (
           <div className="col-span-2">
-            <Section t={t} title="About Me" index={1}>
+            <Section r={r} id="profile" t={t} title="About Me" index={1}>
               <Summary r={r} t={t} />
             </Section>
           </div>
         )}
         {r.experience.length > 0 && (
           <div className="col-span-2">
-            <Section t={t} title="Work Experience" index={2}>
+            <Section r={r} id="experience" t={t} title="Work Experience" index={2}>
               <Experience r={r} t={t} />
             </Section>
           </div>
         )}
         {r.skills.length > 0 && (
-          <Section t={t} title="Expertise" index={3}>
+          <Section r={r} id="skills" t={t} title="Expertise" index={3}>
             <Skills r={r} t={t} />
           </Section>
         )}
         {r.education.length > 0 && (
-          <Section t={t} title="Education" index={4}>
+          <Section r={r} id="education" t={t} title="Education" index={4}>
             <Education r={r} t={t} />
           </Section>
         )}
         {r.languages.length > 0 && (
-          <Section t={t} title="Language" index={5}>
+          <Section r={r} id="languages" t={t} title="Language" index={5}>
             <Languages r={r} t={t} />
           </Section>
         )}
         {r.settings.showReferences && r.references.length > 0 && (
-          <Section t={t} title="References" index={6}>
+          <Section r={r} id="references" t={t} title="References" index={6}>
             <References r={r} t={t} />
           </Section>
         )}
@@ -331,35 +331,35 @@ export function SplitEngine({ r, t }: EngineProps) {
         <div className="grid grid-cols-2 gap-x-[2em]">
           {r.basics.summary && (
             <div className="col-span-2">
-              <Section t={onField} title="About Me" index={1}>
+              <Section r={r} id="profile" t={onField} title="About Me" index={1}>
                 <Summary r={r} t={onField} />
               </Section>
             </div>
           )}
           {r.experience.length > 0 && (
             <div className="col-span-2">
-              <Section t={onField} title="Experience" index={2}>
+              <Section r={r} id="experience" t={onField} title="Experience" index={2}>
                 <Experience r={r} t={onField} />
               </Section>
             </div>
           )}
           {r.education.length > 0 && (
-            <Section t={onField} title="Education" index={3}>
+            <Section r={r} id="education" t={onField} title="Education" index={3}>
               <Education r={r} t={onField} />
             </Section>
           )}
           {r.skills.length > 0 && (
-            <Section t={onField} title="Skills" index={4}>
+            <Section r={r} id="skills" t={onField} title="Skills" index={4}>
               <Skills r={r} t={onField} />
             </Section>
           )}
           {r.languages.length > 0 && (
-            <Section t={onField} title="Languages" index={5}>
+            <Section r={r} id="languages" t={onField} title="Languages" index={5}>
               <Languages r={r} t={onField} />
             </Section>
           )}
           {r.settings.showReferences && r.references.length > 0 && (
-            <Section t={onField} title="References" index={6}>
+            <Section r={r} id="references" t={onField} title="References" index={6}>
               <References r={r} t={onField} />
             </Section>
           )}

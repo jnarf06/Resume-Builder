@@ -8,10 +8,11 @@ import { HINTS, MOCK } from "@/lib/seed";
 import { getTemplate } from "@/lib/templates/catalog";
 import PagePreview from "@/components/templates/PagePreview";
 import { Accordion, Button, ItemControls, Select, Text, TextArea, Toggle } from "./Fields";
+import ColorPicker from "./ColorPicker";
+import SkillsEditor from "./SkillsEditor";
+import SectionColor from "./SectionColor";
 
 type Patch = (fn: (draft: Resume) => void) => void;
-
-const ACCENTS = ["#3d4a5c", "#1f3a5f", "#14532d", "#7c2d12", "#4c1d95", "#0f172a"];
 
 const EMPLOYMENT = [
   { value: "", label: "— not specified —" },
@@ -85,34 +86,7 @@ export default function EditorPanel({
             : "Two columns. Looks better to a person, but a job portal may interleave the sidebar into your job bullets. Keep an ATS-safe version for online applications."}
         </p>
 
-        <div>
-          <span className="mb-1.5 block text-xs font-medium text-slate-600">Accent colour</span>
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              onClick={() => patch((d) => void (d.settings.accent = ""))}
-              className={`rounded-md border px-2 py-1 text-[11px] font-medium transition ${
-                r.settings.accent === ""
-                  ? "border-slate-800 bg-slate-800 text-white"
-                  : "border-slate-300 text-slate-600 hover:bg-slate-50"
-              }`}
-            >
-              Template default
-            </button>
-            {ACCENTS.map((c) => (
-              <button
-                key={c}
-                type="button"
-                onClick={() => patch((d) => void (d.settings.accent = c))}
-                className={`h-7 w-7 rounded-full transition ${
-                  r.settings.accent === c ? "ring-2 ring-slate-800 ring-offset-2" : ""
-                }`}
-                style={{ backgroundColor: c }}
-                aria-label={c}
-              />
-            ))}
-          </div>
-        </div>
+        <ColorPicker r={r} patch={patch} />
 
         <label className="block">
           <span className="mb-1 flex justify-between text-xs font-medium text-slate-600">
@@ -206,6 +180,8 @@ export default function EditorPanel({
           />
         </div>
 
+        <SectionColor r={r} patch={patch} id="contact" />
+
         <div className="flex items-center gap-3 pt-1">
           <input
             ref={fileRef}
@@ -232,6 +208,8 @@ export default function EditorPanel({
           value={r.basics.summary}
           onChange={(v) => patch((d) => void (d.basics.summary = v))}
         />
+
+        <SectionColor r={r} patch={patch} id="profile" />
       </Accordion>
 
       {/* ------------------------------------------------ experience */}
@@ -314,18 +292,13 @@ export default function EditorPanel({
         >
           + Add role
         </Button>
+        <SectionColor r={r} patch={patch} id="experience" />
       </Accordion>
 
       {/* ------------------------------------------------ skills */}
       <Accordion title="Skills" count={r.skills.length}>
-        <TextArea
-          label="Skills"
-          hint="one per line"
-          placeholder={HINTS.skills}
-          rows={Math.min(24, Math.max(5, r.skills.length + 1))}
-          value={r.skills.join("\n")}
-          onChange={(v) => patch((d) => void (d.skills = v.split("\n")))}
-        />
+        <SkillsEditor r={r} patch={patch} />
+        <SectionColor r={r} patch={patch} id="skills" />
       </Accordion>
 
       {/* ------------------------------------------------ education */}
@@ -378,6 +351,7 @@ export default function EditorPanel({
         >
           + Add education
         </Button>
+        <SectionColor r={r} patch={patch} id="education" />
       </Accordion>
 
       {/* ------------------------------------------------ languages */}
@@ -413,6 +387,7 @@ export default function EditorPanel({
         >
           + Add language
         </Button>
+        <SectionColor r={r} patch={patch} id="languages" />
       </Accordion>
 
       {/* ------------------------------------------------ references */}
@@ -475,6 +450,7 @@ export default function EditorPanel({
         >
           + Add reference
         </Button>
+        <SectionColor r={r} patch={patch} id="references" />
       </Accordion>
 
       {/* ------------------------------------------------ declaration */}

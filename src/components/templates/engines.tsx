@@ -42,32 +42,32 @@ function MainSections({
   return (
     <>
       {r.basics.summary && (
-        <Section t={t} title="Profile" index={++n}>
+        <Section r={r} id="profile" t={t} title="Profile" index={++n}>
           <Summary r={r} t={t} />
         </Section>
       )}
       {r.skills.length > 0 && (
-        <Section t={t} title="Skills" index={++n}>
+        <Section r={r} id="skills" t={t} title="Skills" index={++n}>
           <SkillsGrid r={r} t={t} />
         </Section>
       )}
       {r.experience.length > 0 && (
-        <Section t={t} title="Work Experience" index={++n}>
+        <Section r={r} id="experience" t={t} title="Work Experience" index={++n}>
           <Experience r={r} t={t} variant={timeline ? "timeline" : "plain"} />
         </Section>
       )}
       {r.education.length > 0 && (
-        <Section t={t} title="Education" index={++n}>
+        <Section r={r} id="education" t={t} title="Education" index={++n}>
           <Education r={r} t={t} layout="rows" />
         </Section>
       )}
       {r.languages.length > 0 && (
-        <Section t={t} title="Languages" index={++n}>
+        <Section r={r} id="languages" t={t} title="Languages" index={++n}>
           <Languages r={r} t={t} layout="inline" />
         </Section>
       )}
       {r.settings.showReferences && r.references.length > 0 && (
-        <Section t={t} title="References" index={++n}>
+        <Section r={r} id="references" t={t} title="References" index={++n}>
           <References r={r} t={t} />
         </Section>
       )}
@@ -110,12 +110,12 @@ export function SidebarEngine({ r, t, spec }: EngineProps) {
         {!right && aside}
         <main className="flex-1" style={{ padding: "2em 1.8em" }}>
           {r.basics.summary && (
-            <Section t={t} title="Profile" index={sideCount + 1}>
+            <Section r={r} id="profile" t={t} title="Profile" index={sideCount + 1}>
               <Summary r={r} t={t} />
             </Section>
           )}
           {r.experience.length > 0 && (
-            <Section t={t} title="Work Experience" index={sideCount + 2}>
+            <Section r={r} id="experience" t={t} title="Work Experience" index={sideCount + 2}>
               <Experience r={r} t={t} />
             </Section>
           )}
@@ -246,28 +246,28 @@ export function CardsEngine({ r, t }: EngineProps) {
 
       {r.basics.summary && (
         <Card t={t}>
-          <Section t={t} title="Profile">
+          <Section r={r} id="profile" t={t} title="Profile">
             <Summary r={r} t={t} />
           </Section>
         </Card>
       )}
       {r.skills.length > 0 && (
         <Card t={t}>
-          <Section t={t} title="Skills">
+          <Section r={r} id="skills" t={t} title="Skills">
             <SkillsGrid r={r} t={t} />
           </Section>
         </Card>
       )}
       {r.experience.length > 0 && (
         <Card t={t}>
-          <Section t={t} title="Work Experience">
+          <Section r={r} id="experience" t={t} title="Work Experience">
             <Experience r={r} t={t} />
           </Section>
         </Card>
       )}
       {r.education.length > 0 && (
         <Card t={t}>
-          <Section t={t} title="Education">
+          <Section r={r} id="education" t={t} title="Education">
             <Education r={r} t={t} layout="rows" />
           </Section>
         </Card>
@@ -276,12 +276,12 @@ export function CardsEngine({ r, t }: EngineProps) {
         <Card t={t}>
           <div className="grid grid-cols-2 gap-[1.5em]">
             {r.languages.length > 0 && (
-              <Section t={t} title="Languages">
+              <Section r={r} id="languages" t={t} title="Languages">
                 <Languages r={r} t={t} />
               </Section>
             )}
             {r.settings.showReferences && r.references.length > 0 && (
-              <Section t={t} title="References">
+              <Section r={r} id="references" t={t} title="References">
                 <References r={r} t={t} />
               </Section>
             )}
@@ -331,34 +331,34 @@ export function CompactEngine({ r, t }: EngineProps) {
       </header>
 
       {r.basics.summary && (
-        <Section t={t} title="Profile">
+        <Section r={r} id="profile" t={t} title="Profile">
           <Summary r={r} t={t} />
         </Section>
       )}
       {r.experience.length > 0 && (
-        <Section t={t} title="Work Experience">
+        <Section r={r} id="experience" t={t} title="Work Experience">
           <Experience r={r} t={t} />
         </Section>
       )}
 
       <div className="grid grid-cols-2 gap-x-[1.8em]">
         {r.skills.length > 0 && (
-          <Section t={t} title="Skills">
+          <Section r={r} id="skills" t={t} title="Skills">
             <Skills r={r} t={t} />
           </Section>
         )}
         {r.education.length > 0 && (
-          <Section t={t} title="Education">
+          <Section r={r} id="education" t={t} title="Education">
             <Education r={r} t={t} />
           </Section>
         )}
         {r.languages.length > 0 && (
-          <Section t={t} title="Languages">
+          <Section r={r} id="languages" t={t} title="Languages">
             <Languages r={r} t={t} />
           </Section>
         )}
         {r.settings.showReferences && r.references.length > 0 && (
-          <Section t={t} title="References">
+          <Section r={r} id="references" t={t} title="References">
             <References r={r} t={t} />
           </Section>
         )}

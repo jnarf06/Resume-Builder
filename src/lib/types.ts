@@ -32,6 +32,12 @@ export type Education = {
 
 export type Language = { id: string; name: string; level: string };
 
+/**
+ * `level` is 1–5, or null for "no rating". Templates that draw meters map it
+ * onto their own scale; templates that do not simply print the name.
+ */
+export type Skill = { id: string; name: string; level: number | null };
+
 export type Reference = {
   id: string;
   name: string;
@@ -41,10 +47,61 @@ export type Reference = {
   email: string;
 };
 
+/**
+ * Per-element colour overrides. Every field is optional: an absent or empty
+ * value means "use whatever the template specifies", which is what keeps a
+ * template switch from carrying the previous design's palette with it.
+ */
+export type ColorOverrides = {
+  accent?: string;
+  /** Sidebar, card and panel tint. */
+  surface?: string;
+  /** Body text. */
+  ink?: string;
+  /** Page background. */
+  page?: string;
+  /** Text sitting on an accent-filled area. */
+  onAccent?: string;
+};
+
+export const COLOR_ROLES: { key: keyof ColorOverrides; label: string; hint: string }[] = [
+  { key: "accent", label: "Accent", hint: "Headings, rules, bullets, banner fills" },
+  { key: "surface", label: "Panel", hint: "Sidebar, card and block backgrounds" },
+  { key: "page", label: "Page", hint: "The paper itself" },
+  { key: "ink", label: "Body text", hint: "Paragraphs and bullet text" },
+  { key: "onAccent", label: "On accent", hint: "Text sitting on a filled area" },
+];
+
+/** Resume sections that can carry their own heading colour. */
+export type SectionId =
+  | "profile"
+  | "skills"
+  | "experience"
+  | "education"
+  | "languages"
+  | "references"
+  | "contact";
+
+export const SECTION_LABELS: Record<SectionId, string> = {
+  profile: "Profile",
+  skills: "Skills",
+  experience: "Work experience",
+  education: "Education",
+  languages: "Languages",
+  references: "References",
+  contact: "Contact",
+};
+
 export type Settings = {
   template: TemplateId;
-  /** Empty string means "use the template's own accent". */
+  /** @deprecated superseded by `colors.accent`; kept so old saves still load. */
   accent: string;
+  colors: ColorOverrides;
+  /**
+   * Per-section heading colour. Unset sections follow `colors.accent`, so a
+   * template switch still recolours everything you have not pinned.
+   */
+  sectionColors: Partial<Record<SectionId, string>>;
   showPhoto: boolean;
   showDeclaration: boolean;
   showReferences: boolean;
@@ -59,7 +116,7 @@ export type Resume = {
   updatedAt: number;
   settings: Settings;
   basics: Basics;
-  skills: string[];
+  skills: Skill[];
   experience: Experience[];
   education: Education[];
   languages: Language[];

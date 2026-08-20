@@ -1,5 +1,6 @@
 import type { Resume } from "./types";
 import { uid } from "./types";
+import { migrate } from "./storage";
 
 /**
  * Share a resume as a link, without a server.
@@ -70,8 +71,9 @@ export async function decodeResume(payload: string): Promise<Resume> {
   const bytes = codec === DEFLATED ? await pump(body, new DecompressionStream("deflate-raw")) : body;
   const data = JSON.parse(new TextDecoder().decode(bytes)) as Resume;
   if (!data || typeof data !== "object" || !data.basics) throw new Error("Not a resume link");
-  // A shared resume becomes a new document in the recipient's library.
-  return { ...data, id: uid(), updatedAt: Date.now() };
+  // A shared resume becomes a new document in the recipient's library, and
+  // may have been made by an older version of the app.
+  return migrate({ ...data, id: uid(), updatedAt: Date.now() });
 }
 
 export async function buildShareLink(r: Resume): Promise<string> {

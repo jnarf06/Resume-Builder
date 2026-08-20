@@ -75,21 +75,46 @@ case, size and two-tone setting, spacing density, bullet glyph, photo shape and 
 background decoration (`corner`, `dot-grid`, `shapes`), and a `dark` flag that flips the
 page to a dark ground with reversed-out type.
 
+### Colours
+
+Five roles can be overridden per resume, each independently: **accent** (headings, rules,
+bullets, banner fills), **panel** (sidebar and card tint), **page**, **body text**, and
+**on accent** (text over a filled area). Each has a native colour input plus twelve
+presets.
+
+A role left unset follows the template, so switching designs still changes the whole look;
+only the roles you overrode stay put. `resolveTokens()` in `Renderer.tsx` layers
+`settings.colors` over the spec's tokens.
+
+**Per-section heading colours** sit on top of that. Each section — profile, contact, skills,
+experience, education, languages, references — can pin its own heading colour, and the
+control lives inside that section's panel in the editor rather than in a central palette.
+Unset sections follow the accent. Only the heading and its decoration (bar, chip, box,
+rule, number badge) recolour; the body stays on the document palette, which stops a resume
+with several section colours reading like a ransom note.
+
+`Section` takes optional `r` and `id` props and resolves `settings.sectionColors[id]`
+itself. It is prop-driven rather than context-driven on purpose: the marketing homepage
+renders these templates as a *server* component, and React context would pull the entire
+template tree into the client bundle.
+
 ### Skill and language meters
 
-Templates with a `meter` token draw a level next to each skill, but only when you give it
-one. Add a pipe and a number in the Skills box:
+Skills are `{ id, name, level }` where `level` is 1–5 or `null` for unrated. The editor
+gives each skill a row with a name field and a click-to-set 1–5 rating; clicking the
+current value clears it. **Paste a list** swaps in a newline-separated list while keeping
+the ratings of any names that still match.
 
-```
-Google Ads | 5              five-point scale
-Excel | 80                  anything over 5 is read as a percentage
-English | 4/5               explicit out-of
-Stakeholder Reporting       no meter, just text
-```
+Templates carrying a `meter` token (`bar`, `dots`, `stars`) draw rated skills; the rest
+print names only and quietly ignore the rating. The Skills panel says which of the two the
+current template does.
 
-Languages use their existing Level field — `Native`, `Fluent`, `Advanced`,
-`Conversational`, `Basic` and friends map onto the same scale. Templates without a meter
-strip the level and print the label alone, so the syntax never leaks into a plain resume.
+Languages still use their free-text Level field — `Native`, `Fluent`, `Advanced`,
+`Conversational`, `Basic` map onto the same scale, as does a bare number.
+
+An earlier version stored skills as strings with a `"Google Ads | 4"` pipe syntax.
+`migrate()` in `storage.ts` parses those into the structured shape, and runs on everything
+arriving from outside: localStorage, JSON import, and shared links.
 
 **The ATS badge is the important part.** A parser reads a PDF's text layer top to bottom,
 so a two-column page can interleave the sidebar into your job bullets. Sidebar templates
