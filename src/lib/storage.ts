@@ -10,6 +10,35 @@ const ACTIVE = "rb.active.v1";
  * and reloading would silently hand the sample back.
  */
 const SEEDED = "rb.seeded.v1";
+/** Timestamp of the last JSON export, used to nudge for a backup. */
+const EXPORTED = "rb.exported.v1";
+
+/**
+ * Private browsing and some locked-down configurations expose localStorage but
+ * throw on write. Without this check the app looks like it is saving and
+ * silently is not — the worst possible failure for a document editor.
+ */
+export function storageAvailable(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    const probe = "rb.probe";
+    window.localStorage.setItem(probe, "1");
+    window.localStorage.removeItem(probe);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function markExported() {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(EXPORTED, String(Date.now()));
+}
+
+export function lastExportedAt(): number {
+  if (typeof window === "undefined") return 0;
+  return Number(window.localStorage.getItem(EXPORTED) ?? 0);
+}
 
 /** Deep clone that works for our plain-JSON resume shape. */
 const clone = <T,>(v: T): T => JSON.parse(JSON.stringify(v)) as T;
@@ -132,6 +161,7 @@ export function exportJson(resume: Resume) {
   a.download = `${resume.docName.replace(/[^\w\s-]/g, "").trim() || "resume"}.json`;
   a.click();
   URL.revokeObjectURL(url);
+  markExported();
 }
 
 export async function importJson(file: File): Promise<Resume> {

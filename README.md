@@ -101,6 +101,25 @@ gallery toward templates whose tone suits that field — conservative shapes for
 and legal, denser ones for maritime service records, warmer ones for retail and
 hospitality. Any template works with any resume.
 
+## No accounts, by design
+
+There is no login and no user identity. Resumes are keyed to the browser they were made
+in. Three things close the gaps that would otherwise create:
+
+- **Share link** (`src/lib/share.ts`) encodes a resume into the URL *fragment*
+  (`/editor#r=…`). Fragments are never sent in an HTTP request, so a shared link reaches
+  the recipient without the data touching a server. JSON is deflated and base64url-encoded
+  — a realistic resume lands around 400 characters. Photos are stripped: a data URL is
+  100–400KB and will not fit in a URL.
+- **Backup nudge** warns when the newest edit is later than the last JSON export.
+  Clearing site data is silent and total, so the app has to say so.
+- **Storage probe** detects a browser that exposes `localStorage` but throws on write
+  (private browsing, locked-down profiles) and shows a red banner. Otherwise the app looks
+  like it is saving and silently is not.
+
+`bootstrap()` seeds the sample resume on a genuine first visit only, tracked with a
+`rb.seeded.v1` flag. Without it, "Clear all data" would be undone by the next reload.
+
 ## The Check tab
 
 `src/lib/audit.ts` runs a set of rules over the resume and scores it out of 100:

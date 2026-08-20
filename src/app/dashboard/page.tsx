@@ -19,6 +19,7 @@ import { ALL_TEMPLATES, getTemplate } from "@/lib/templates/catalog";
 import { INDUSTRIES } from "@/lib/templates/types";
 import { MOCK } from "@/lib/seed";
 import PagePreview from "@/components/templates/PagePreview";
+import { BackupBanner, StorageBanner } from "@/components/Banners";
 
 /** A few templates surfaced on the dashboard as a way in to the catalogue. */
 const FEATURED = ["ortigas", "manila-plain", "lagoon", "broadsheet", "makati", "onyx"];
@@ -99,6 +100,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-slate-100">
+      <StorageBanner />
       {/* ------------------------------------------------------------- nav */}
       <header className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex max-w-6xl items-center gap-4 px-6 py-3">
@@ -146,6 +148,7 @@ export default function Dashboard() {
       />
 
       <main className="mx-auto max-w-6xl px-6 py-8">
+        <BackupBanner list={list} />
         {/* ------------------------------------------------------------ hero */}
         <section className="mb-8 overflow-hidden rounded-xl border border-slate-200 bg-white">
           <div className="flex flex-col gap-6 p-7 sm:flex-row sm:items-center">

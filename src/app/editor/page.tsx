@@ -14,6 +14,8 @@ import {
   withSampleContent,
 } from "@/lib/storage";
 import { useLibrary } from "@/lib/useLibrary";
+import { buildShareLink, copyToClipboard, decodeResume, takeSharePayload } from "@/lib/share";
+import { StorageBanner } from "@/components/Banners";
 import { auditResume } from "@/lib/audit";
 import EditorPanel from "@/components/editor/EditorPanel";
 import AuditPanel from "@/components/AuditPanel";
@@ -42,6 +44,7 @@ function Editor() {
   const [activeId, setActive] = useState<string>("");
   const [tab, setTab] = useState<Tab>("edit");
   const [galleryOpen, setGalleryOpen] = useState(false);
+  const [shareNote, setShareNote] = useState("");
   const importRef = useRef<HTMLInputElement>(null);
 
   // Open whichever resume the dashboard linked to; fall back to the first one.
@@ -72,6 +75,40 @@ function Editor() {
   useEffect(() => {
     if (ready && resolvedId) setActiveId(resolvedId);
   }, [resolvedId, ready]);
+
+  // A resume arriving by shared link. The payload lives in the URL fragment,
+  // which never reaches a server, and is consumed on read so a refresh does
+  // not import it twice.
+  useEffect(() => {
+    if (!ready) return;
+    const payload = takeSharePayload();
+    if (!payload) return;
+    let cancelled = false;
+    decodeResume(payload)
+      .then((incoming) => {
+        if (cancelled) return;
+        setList((p) => [...p, incoming]);
+        setActive(incoming.id);
+        setShareNote(`Opened “${incoming.docName}” from a shared link. It is now saved here.`);
+      })
+      .catch(() => {
+        if (!cancelled) setShareNote("That shared link could not be read.");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [ready, setList]);
+
+  async function share() {
+    if (!resume) return;
+    const link = await buildShareLink(resume);
+    const ok = await copyToClipboard(link);
+    setShareNote(
+      ok
+        ? "Link copied. It carries the resume itself — no photo, and nothing is uploaded."
+        : "Could not reach the clipboard. Copy the address bar after opening the link.",
+    );
+  }
 
   const issueCount = resume ? auditResume(resume).length : 0;
 
@@ -171,6 +208,21 @@ function Editor() {
 
   return (
     <div className="flex h-screen flex-col bg-slate-100">
+      <div className="no-print">
+        <StorageBanner />
+        {shareNote && (
+          <div className="flex items-center gap-3 border-b border-sky-200 bg-sky-50 px-4 py-2 text-xs text-sky-900">
+            <span className="leading-relaxed">{shareNote}</span>
+            <button
+              type="button"
+              onClick={() => setShareNote("")}
+              className="ml-auto shrink-0 rounded border border-sky-300 px-2 py-0.5 font-medium hover:bg-sky-100"
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
+      </div>
       {/* ---------------------------------------------------------- toolbar */}
       <header className="no-print flex shrink-0 flex-wrap items-center gap-3 border-b border-slate-200 bg-white px-4 py-2.5">
         <Link
@@ -207,6 +259,7 @@ function Editor() {
           <Tool onClick={fillWithSample}>Sample data</Tool>
           <Tool onClick={() => importRef.current?.click()}>Import</Tool>
           <Tool onClick={() => exportJson(resume)}>Export data</Tool>
+          <Tool onClick={share}>Share link</Tool>
           <Tool onClick={remove} danger>
             Delete
           </Tool>

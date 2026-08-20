@@ -247,6 +247,10 @@ function Features() {
       title: "Yours, and only yours",
       body: "No sign-up, no server, no analytics on your content. Resumes live in your browser. Export JSON to back them up or move machines.",
     },
+    {
+      title: "Share without uploading",
+      body: "Share link puts the whole resume inside the link itself, in the part of a URL browsers never send to a server. Open it on your phone and it is there — no account on either end.",
+    },
   ];
 
   return (
@@ -460,6 +464,10 @@ function Faq() {
     {
       q: "Where are my resumes stored?",
       a: "In your browser's local storage, on this device only. Clearing site data deletes them, so use Export to keep a JSON backup. Import brings it back on any machine.",
+    },
+    {
+      q: "Can I move a resume to my phone without an account?",
+      a: "Yes. Share link encodes the resume into the URL fragment — the part after the # that browsers never transmit to a server. Send it to yourself, open it, and it saves into that browser. Photos are left out because they are too large for a URL.",
     },
     {
       q: "What does the ATS badge actually mean?",
