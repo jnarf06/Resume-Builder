@@ -1,0 +1,171 @@
+import type { Resume } from "./types";
+import { uid } from "./types";
+import { SAMPLE, BLANK } from "./seed";
+
+const KEY = "rb.resumes.v1";
+const ACTIVE = "rb.active.v1";
+/**
+ * Set once the visitor has been given the sample. Without it, "an empty
+ * library" and "a first visit" are indistinguishable, so clearing your data
+ * and reloading would silently hand the sample back.
+ */
+const SEEDED = "rb.seeded.v1";
+
+/** Deep clone that works for our plain-JSON resume shape. */
+const clone = <T,>(v: T): T => JSON.parse(JSON.stringify(v)) as T;
+
+export function newResume(from: "sample" | "blank" = "blank"): Resume {
+  const base = clone(from === "sample" ? SAMPLE : BLANK);
+  return { ...base, id: uid(), updatedAt: Date.now() };
+}
+
+/**
+ * The first version shipped two hard-coded templates. Anything saved back then
+ * carries those ids, so map them onto their nearest equivalents in the
+ * catalogue rather than falling back to the default and losing the choice.
+ */
+const LEGACY_TEMPLATES: Record<string, string> = {
+  classic: "ortigas",
+  ats: "manila-plain",
+};
+
+function migrate(r: Resume): Resume {
+  const mapped = LEGACY_TEMPLATES[r.settings?.template];
+  if (!mapped) return r;
+  // The old accent was a user choice on a template that had none of its own;
+  // clearing it lets the new template's palette come through.
+  return { ...r, settings: { ...r.settings, template: mapped, accent: "" } };
+}
+
+/** A copy with a fresh id and name, ready to add to the library. */
+export function duplicateResume(r: Resume): Resume {
+  return { ...clone(r), id: uid(), docName: `${r.docName} (copy)`, updatedAt: Date.now() };
+}
+
+export function loadAll(): Resume[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? (parsed as Resume[]).map(migrate) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveAll(list: Resume[]) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(KEY, JSON.stringify(list));
+  } catch {
+    // Quota is the realistic failure here — a large photo data URL.
+    console.warn("Could not save: browser storage is full. Try a smaller photo.");
+  }
+}
+
+export function getActiveId(): string | null {
+  if (typeof window === "undefined") return null;
+  return window.localStorage.getItem(ACTIVE);
+}
+
+export function setActiveId(id: string) {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(ACTIVE, id);
+}
+
+/**
+ * A genuine first visit gets the sample resume so the templates have something
+ * to render. An empty library after that is a deliberate choice — leave it
+ * empty and let the dashboard's empty state do the talking.
+ */
+export function bootstrap(): { list: Resume[]; activeId: string } {
+  let list = loadAll();
+  const firstVisit = typeof window !== "undefined" && !window.localStorage.getItem(SEEDED);
+
+  if (list.length === 0 && firstVisit) {
+    list = [newResume("sample")];
+    saveAll(list);
+    setActiveId(list[0].id);
+  }
+  if (typeof window !== "undefined") window.localStorage.setItem(SEEDED, "1");
+
+  const stored = getActiveId();
+  const activeId = list.some((r) => r.id === stored) ? (stored as string) : (list[0]?.id ?? "");
+  return { list, activeId };
+}
+
+/**
+ * Swap a resume's *content* for the sample, keeping its template, colours and
+ * format toggles. Useful for filling a design with realistic text — and for
+ * clearing personal details out of a document you are about to show someone.
+ */
+export function withSampleContent(r: Resume): Resume {
+  const s = clone(SAMPLE);
+  return {
+    ...r,
+    basics: s.basics,
+    skills: s.skills,
+    experience: s.experience,
+    education: s.education,
+    languages: s.languages,
+    references: s.references,
+    declaration: s.declaration,
+    updatedAt: Date.now(),
+  };
+}
+
+/** Remove every resume from this browser. Irreversible — confirm before calling. */
+export function clearAll() {
+  if (typeof window === "undefined") return;
+  window.localStorage.removeItem(KEY);
+  window.localStorage.removeItem(ACTIVE);
+  // Keep the seeded flag so the wipe survives a reload.
+  window.localStorage.setItem(SEEDED, "1");
+}
+
+export function exportJson(resume: Resume) {
+  const blob = new Blob([JSON.stringify(resume, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${resume.docName.replace(/[^\w\s-]/g, "").trim() || "resume"}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+export async function importJson(file: File): Promise<Resume> {
+  const text = await file.text();
+  const data = JSON.parse(text) as Resume;
+  if (!data || typeof data !== "object" || !data.basics) throw new Error("Not a resume file");
+  return { ...data, id: uid(), updatedAt: Date.now() };
+}
+
+/**
+ * Downscale an uploaded photo before it goes into localStorage — a raw phone
+ * photo is several MB of base64 and blows the 5MB quota on its own.
+ */
+export function readPhoto(file: File, max = 480): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error("Could not read that file"));
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error("That file is not an image"));
+      img.onload = () => {
+        const scale = Math.min(1, max / Math.max(img.width, img.height));
+        const w = Math.round(img.width * scale);
+        const h = Math.round(img.height * scale);
+        const canvas = document.createElement("canvas");
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return reject(new Error("Canvas unavailable"));
+        ctx.drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL("image/jpeg", 0.85));
+      };
+      img.src = reader.result as string;
+    };
+    reader.readAsDataURL(file);
+  });
+}

@@ -1,0 +1,65 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+}
+
+/* The resume document itself never follows the OS dark theme — it is print
+   artwork, not UI, and it has to look identical on screen and on paper. */
+.resume-doc {
+  color-scheme: light;
+}
+
+/* Keep a job entry, an education line or a reference from splitting across a
+   page boundary. Applies on screen too (harmless) and in print (the point). */
+.avoid-break {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  /* Backgrounds and the accent bar are the design — without this Chrome drops
+     them and the Classic template prints as white-on-white. */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  html,
+  body {
+    height: auto !important;
+    background: #fff !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  /* Unwind the app chrome: the editor lives inside fixed-height, scrolling
+     flex containers, and anything clipped by overflow is clipped in print. */
+  body * {
+    overflow: visible !important;
+  }
+
+  .h-screen {
+    height: auto !important;
+  }
+
+  .print-root {
+    width: 210mm !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+  }
+}
