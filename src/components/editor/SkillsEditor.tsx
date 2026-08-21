@@ -13,7 +13,7 @@ function move<T>(arr: T[], from: number, to: number) {
   arr.splice(to, 0, item);
 }
 
-/** Bring a newly appended row into view; the list can run past the fold. */
+/** Safety net for a long list; the new row sits under the button already. */
 function reveal(id: string) {
   setTimeout(() => {
     document.getElementById(`item-${id}`)?.scrollIntoView({ block: "nearest", behavior: "smooth" });
@@ -125,6 +125,32 @@ export default function SkillsEditor({ r, patch }: { r: Resume; patch: Patch }) 
         )}
       </p>
 
+      <div className="flex flex-wrap gap-2 pt-1">
+        <Button
+          variant="primary"
+          onClick={() => {
+            const id = uid();
+            patch((d) => d.skills.unshift({ id, name: "", level: null } as Skill));
+            reveal(id);
+          }}
+        >
+          + Add skill
+        </Button>
+        <Button
+          onClick={() => {
+            setDraft(r.skills.map((s) => s.name).join("\n"));
+            setBulk(true);
+          }}
+        >
+          Paste a list
+        </Button>
+        {rated > 0 && (
+          <Button onClick={() => patch((d) => d.skills.forEach((s) => void (s.level = null)))}>
+            Clear all ratings
+          </Button>
+        )}
+      </div>
+
       {r.skills.map((s, i) => (
         <div
           key={s.id}
@@ -151,31 +177,6 @@ export default function SkillsEditor({ r, patch }: { r: Resume; patch: Patch }) 
         </div>
       ))}
 
-      <div className="flex flex-wrap gap-2 pt-1">
-        <Button
-          variant="primary"
-          onClick={() => {
-            const id = uid();
-            patch((d) => d.skills.push({ id, name: "", level: null } as Skill));
-            reveal(id);
-          }}
-        >
-          + Add skill
-        </Button>
-        <Button
-          onClick={() => {
-            setDraft(r.skills.map((s) => s.name).join("\n"));
-            setBulk(true);
-          }}
-        >
-          Paste a list
-        </Button>
-        {rated > 0 && (
-          <Button onClick={() => patch((d) => d.skills.forEach((s) => void (s.level = null)))}>
-            Clear all ratings
-          </Button>
-        )}
-      </div>
     </div>
   );
 }

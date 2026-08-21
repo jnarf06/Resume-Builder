@@ -30,10 +30,12 @@ function move<T>(arr: T[], from: number, to: number) {
 }
 
 /**
- * Every "+ Add" button sits below its list, so every add appends. The new row
- * can land below the fold, so scroll it into view once React has committed —
- * click handlers flush synchronously, so a 0ms timeout runs after the DOM
- * update.
+ * Every "+ Add" button sits *above* its list and every add prepends, so the new
+ * entry appears directly under the button you just pressed. It also matches how
+ * a resume is ordered: most recent first.
+ *
+ * The scroll is a safety net for a long list — click handlers flush
+ * synchronously, so a 0ms timeout runs after React has committed the new row.
  */
 function reveal(id: string) {
   setTimeout(() => {
@@ -226,6 +228,27 @@ export default function EditorPanel({
 
       {/* ------------------------------------------------ experience */}
       <Accordion title="Work experience" count={r.experience.length} defaultOpen>
+        <Button
+          variant="primary"
+          onClick={() => {
+            const id = uid();
+            patch((d) =>
+              d.experience.unshift({
+                id,
+                company: "",
+                role: "",
+                start: "",
+                end: "",
+                employment: "",
+                bullets: [""],
+              }),
+            );
+            reveal(id);
+          }}
+        >
+          + Add role
+        </Button>
+
         {r.experience.map((e, i) => (
           <div
             key={e.id}
@@ -233,9 +256,7 @@ export default function EditorPanel({
             className="rounded-lg border border-slate-200 bg-slate-50/60 p-3"
           >
             <div className="mb-2 flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-500">
-                {e.company || "New role"}
-              </span>
+              <span className="text-xs font-semibold text-slate-500">{e.company || "New role"}</span>
               <ItemControls
                 isFirst={i === 0}
                 isLast={i === r.experience.length - 1}
@@ -290,26 +311,7 @@ export default function EditorPanel({
             </div>
           </div>
         ))}
-        <Button
-          variant="primary"
-          onClick={() => {
-            const id = uid();
-            patch((d) =>
-              d.experience.push({
-                id,
-                company: "",
-                role: "",
-                start: "",
-                end: "",
-                employment: "",
-                bullets: [""],
-              }),
-            );
-            reveal(id);
-          }}
-        >
-          + Add role
-        </Button>
+
         <SectionColor r={r} patch={patch} id="experience" />
       </Accordion>
 
@@ -321,6 +323,17 @@ export default function EditorPanel({
 
       {/* ------------------------------------------------ education */}
       <Accordion title="Education" count={r.education.length}>
+        <Button
+          variant="primary"
+          onClick={() => {
+            const id = uid();
+            patch((d) => d.education.unshift({ id, school: "", course: "", level: "", year: "" } as Education));
+            reveal(id);
+          }}
+        >
+          + Add education
+        </Button>
+
         {r.education.map((e, i) => (
           <div
             key={e.id}
@@ -365,21 +378,23 @@ export default function EditorPanel({
             </div>
           </div>
         ))}
-        <Button
-          variant="primary"
-          onClick={() => {
-            const id = uid();
-            patch((d) => d.education.push({ id, school: "", course: "", level: "", year: "" } as Education));
-            reveal(id);
-          }}
-        >
-          + Add education
-        </Button>
+
         <SectionColor r={r} patch={patch} id="education" />
       </Accordion>
 
       {/* ------------------------------------------------ languages */}
       <Accordion title="Languages" count={r.languages.length}>
+        <Button
+          variant="primary"
+          onClick={() => {
+            const id = uid();
+            patch((d) => d.languages.unshift({ id, name: "", level: "" } as Language));
+            reveal(id);
+          }}
+        >
+          + Add language
+        </Button>
+
         {r.languages.map((l, i) => (
           <div key={l.id} id={`item-${l.id}`} className="flex items-end gap-2">
             <div className="grid flex-1 grid-cols-2 gap-2.5">
@@ -405,21 +420,25 @@ export default function EditorPanel({
             />
           </div>
         ))}
-        <Button
-          variant="primary"
-          onClick={() => {
-            const id = uid();
-            patch((d) => d.languages.push({ id, name: "", level: "" } as Language));
-            reveal(id);
-          }}
-        >
-          + Add language
-        </Button>
+
         <SectionColor r={r} patch={patch} id="languages" />
       </Accordion>
 
       {/* ------------------------------------------------ references */}
       <Accordion title="References" count={r.references.length}>
+        <Button
+          variant="primary"
+          onClick={() => {
+            const id = uid();
+            patch((d) =>
+              d.references.unshift({ id, name: "", role: "", company: "", phone: "", email: "" } as Reference),
+            );
+            reveal(id);
+          }}
+        >
+          + Add reference
+        </Button>
+
         {r.references.map((x, i) => (
           <div
             key={x.id}
@@ -472,18 +491,7 @@ export default function EditorPanel({
             </div>
           </div>
         ))}
-        <Button
-          variant="primary"
-          onClick={() => {
-            const id = uid();
-            patch((d) =>
-              d.references.push({ id, name: "", role: "", company: "", phone: "", email: "" } as Reference),
-            );
-            reveal(id);
-          }}
-        >
-          + Add reference
-        </Button>
+
         <SectionColor r={r} patch={patch} id="references" />
       </Accordion>
 
