@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import ColorWheel from "./ColorWheel";
 
 /**
  * One colour control, shared by the document palette and the per-section
@@ -62,6 +63,7 @@ export default function ColorField({
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState("");
   const [bad, setBad] = useState(false);
+  const [tab, setTab] = useState<"swatches" | "wheel">("swatches");
 
   const shown = (draft || value).toString();
 
@@ -125,6 +127,23 @@ export default function ColorField({
           />
 
           <div className="relative z-50 mt-2.5 rounded-lg border border-slate-300 bg-white p-2.5 shadow-lg">
+            <div className="mb-2.5 flex gap-1">
+              {(["swatches", "wheel"] as const).map((id) => (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => setTab(id)}
+                  className={`rounded px-2 py-1 text-[11px] font-medium capitalize transition ${
+                    tab === id
+                      ? "bg-slate-800 text-white"
+                      : "border border-slate-300 text-slate-600 hover:bg-slate-50"
+                  }`}
+                >
+                  {id === "wheel" ? "Colour wheel" : "Swatches"}
+                </button>
+              ))}
+            </div>
+
             {/* hex + system picker */}
             <div className="mb-2.5 flex items-center gap-1.5">
               <span className="text-[11px] font-medium text-slate-500">Hex</span>
@@ -173,14 +192,19 @@ export default function ColorField({
               </p>
             )}
 
+            {tab === "wheel" && <ColorWheel value={value} onChange={onChange} />}
+
             {/* neutrals */}
+            {tab === "swatches" && (
             <div className="mb-1.5 flex flex-wrap gap-1">
               {NEUTRALS.map((c) => (
                 <Swatch key={c} color={c} active={value.toLowerCase() === c} onPick={onChange} />
               ))}
             </div>
+            )}
 
             {/* hue grid */}
+            {tab === "swatches" && (
             <div className="grid grid-cols-[repeat(15,minmax(0,1fr))] gap-1">
               {HUES.map((h) =>
                 h.shades.map((c) => (
@@ -194,11 +218,14 @@ export default function ColorField({
                 )),
               )}
             </div>
+            )}
 
-            <p className="mt-2 text-[10px] leading-relaxed text-slate-400">
-              Dark colours read best for headings on white. Light ones suit panels and page
-              backgrounds.
-            </p>
+            {tab === "swatches" && (
+              <p className="mt-2 text-[10px] leading-relaxed text-slate-400">
+                Dark colours read best for headings on white. Light ones suit panels and page
+                backgrounds.
+              </p>
+            )}
           </div>
         </>
       )}
