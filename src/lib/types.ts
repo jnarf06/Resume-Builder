@@ -16,6 +16,8 @@ export type Experience = {
   id: string;
   company: string;
   role: string;
+  /** Where the job was based — "Makati City", "Remote", "Singapore". */
+  location: string;
   start: string; // "Jul 2020"
   end: string; // "Present" or "Feb 2025"
   employment: "" | "Full-time" | "Part-time" | "Contract" | "Freelance" | "Internship";

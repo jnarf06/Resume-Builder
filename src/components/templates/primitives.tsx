@@ -531,8 +531,7 @@ export function Experience({ r, t, variant = "plain" }: Ctx & { variant?: "plain
               </span>
             </div>
             <p style={{ fontSize: "0.98em", color: t.muted, marginBottom: "0.35em" }}>
-              {e.role}
-              {e.employment && e.employment !== "Full-time" && ` · ${e.employment}`}
+              {[e.role, e.employment, e.location].filter(Boolean).join(" · ")}
             </p>
             <ul>
               {bullets.map((b, i) => (

@@ -236,6 +236,7 @@ export default function EditorPanel({
               d.experience.unshift({
                 id,
                 company: "",
+                location: "",
                 role: "",
                 start: "",
                 end: "",
@@ -278,6 +279,14 @@ export default function EditorPanel({
                 value={e.role}
                 onChange={(v) => patch((d) => void (d.experience[i].role = v))}
               />
+              <div className="col-span-2">
+                <Text
+                  label="Location"
+                  placeholder={HINTS.companyLocation}
+                  value={e.location}
+                  onChange={(v) => patch((d) => void (d.experience[i].location = v))}
+                />
+              </div>
               <Text
                 label="Start"
                 placeholder={HINTS.start}

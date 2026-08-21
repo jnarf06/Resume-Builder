@@ -54,6 +54,7 @@ export const SAMPLE: Resume = {
     {
       id: "x1",
       company: "Northwind Retail Group",
+      location: "Makati City",
       role: "Digital Marketing Manager",
       start: "Mar 2021",
       end: "Present",
@@ -69,6 +70,7 @@ export const SAMPLE: Resume = {
     {
       id: "x2",
       company: "Bluewater Travel",
+      location: "Pasig City",
       role: "Senior SEM Specialist",
       start: "Jun 2018",
       end: "Feb 2021",
@@ -82,6 +84,7 @@ export const SAMPLE: Resume = {
     {
       id: "x3",
       company: "Craft & Co. Digital",
+      location: "Remote",
       role: "SEO Specialist",
       start: "Jan 2017",
       end: "May 2018",
@@ -138,7 +141,7 @@ export const BLANK: Resume = {
   },
   skills: [],
   experience: [
-    { id: "b1", company: "", role: "", start: "", end: "", employment: "", bullets: [""] },
+    { id: "b1", company: "", location: "", role: "", start: "", end: "", employment: "", bullets: [""] },
   ],
   education: [{ id: "b2", school: "", course: "", level: "Tertiary", year: "" }],
   languages: [],
@@ -158,6 +161,7 @@ export const HINTS = {
     "Three to five sentences: what you do, how senior you are, the industries you know, and your single strongest result — with the number in it.",
   company: "Company name",
   role: "Your job title",
+  companyLocation: "Makati City",
   start: "Jan 2021",
   end: "Present",
   bullets:
@@ -224,6 +228,7 @@ export const MOCK: Resume = {
     {
       id: "m1",
       company: "Meridian Services",
+      location: "Makati City",
       role: "Operations Manager",
       start: "Mar 2021",
       end: "Present",
@@ -237,6 +242,7 @@ export const MOCK: Resume = {
     {
       id: "m2",
       company: "Crestline Group",
+      location: "Quezon City",
       role: "Team Leader",
       start: "Jun 2018",
       end: "Feb 2021",
@@ -249,6 +255,7 @@ export const MOCK: Resume = {
     {
       id: "m3",
       company: "Vantage Solutions",
+      location: "Taguig City",
       role: "Senior Associate",
       start: "Jan 2016",
       end: "May 2018",

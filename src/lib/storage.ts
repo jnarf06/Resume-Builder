@@ -95,6 +95,9 @@ export function migrate(r: Resume): Resume {
     ...r,
     settings,
     skills: Array.isArray(r.skills) ? r.skills.map(migrateSkill) : [],
+    experience: Array.isArray(r.experience)
+      ? r.experience.map((e) => ({ ...e, location: e.location ?? "" }))
+      : [],
   };
 }
 
