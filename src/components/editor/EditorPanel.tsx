@@ -29,6 +29,18 @@ function move<T>(arr: T[], from: number, to: number) {
   arr.splice(to, 0, item);
 }
 
+/**
+ * Every "+ Add" button sits below its list, so every add appends. The new row
+ * can land below the fold, so scroll it into view once React has committed —
+ * click handlers flush synchronously, so a 0ms timeout runs after the DOM
+ * update.
+ */
+function reveal(id: string) {
+  setTimeout(() => {
+    document.getElementById(`item-${id}`)?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }, 0);
+}
+
 export default function EditorPanel({
   r,
   patch,
@@ -215,7 +227,11 @@ export default function EditorPanel({
       {/* ------------------------------------------------ experience */}
       <Accordion title="Work experience" count={r.experience.length} defaultOpen>
         {r.experience.map((e, i) => (
-          <div key={e.id} className="rounded-lg border border-slate-200 bg-slate-50/60 p-3">
+          <div
+            key={e.id}
+            id={`item-${e.id}`}
+            className="rounded-lg border border-slate-200 bg-slate-50/60 p-3"
+          >
             <div className="mb-2 flex items-center justify-between">
               <span className="text-xs font-semibold text-slate-500">
                 {e.company || "New role"}
@@ -276,10 +292,11 @@ export default function EditorPanel({
         ))}
         <Button
           variant="primary"
-          onClick={() =>
+          onClick={() => {
+            const id = uid();
             patch((d) =>
-              d.experience.unshift({
-                id: uid(),
+              d.experience.push({
+                id,
                 company: "",
                 role: "",
                 start: "",
@@ -287,8 +304,9 @@ export default function EditorPanel({
                 employment: "",
                 bullets: [""],
               }),
-            )
-          }
+            );
+            reveal(id);
+          }}
         >
           + Add role
         </Button>
@@ -304,7 +322,11 @@ export default function EditorPanel({
       {/* ------------------------------------------------ education */}
       <Accordion title="Education" count={r.education.length}>
         {r.education.map((e, i) => (
-          <div key={e.id} className="rounded-lg border border-slate-200 bg-slate-50/60 p-3">
+          <div
+            key={e.id}
+            id={`item-${e.id}`}
+            className="rounded-lg border border-slate-200 bg-slate-50/60 p-3"
+          >
             <div className="mb-2 flex items-center justify-between">
               <span className="text-xs font-semibold text-slate-500">{e.school || "New entry"}</span>
               <ItemControls
@@ -345,9 +367,11 @@ export default function EditorPanel({
         ))}
         <Button
           variant="primary"
-          onClick={() =>
-            patch((d) => d.education.push({ id: uid(), school: "", course: "", level: "", year: "" } as Education))
-          }
+          onClick={() => {
+            const id = uid();
+            patch((d) => d.education.push({ id, school: "", course: "", level: "", year: "" } as Education));
+            reveal(id);
+          }}
         >
           + Add education
         </Button>
@@ -357,7 +381,7 @@ export default function EditorPanel({
       {/* ------------------------------------------------ languages */}
       <Accordion title="Languages" count={r.languages.length}>
         {r.languages.map((l, i) => (
-          <div key={l.id} className="flex items-end gap-2">
+          <div key={l.id} id={`item-${l.id}`} className="flex items-end gap-2">
             <div className="grid flex-1 grid-cols-2 gap-2.5">
               <Text
                 label="Language"
@@ -383,7 +407,11 @@ export default function EditorPanel({
         ))}
         <Button
           variant="primary"
-          onClick={() => patch((d) => d.languages.push({ id: uid(), name: "", level: "" } as Language))}
+          onClick={() => {
+            const id = uid();
+            patch((d) => d.languages.push({ id, name: "", level: "" } as Language));
+            reveal(id);
+          }}
         >
           + Add language
         </Button>
@@ -393,7 +421,11 @@ export default function EditorPanel({
       {/* ------------------------------------------------ references */}
       <Accordion title="References" count={r.references.length}>
         {r.references.map((x, i) => (
-          <div key={x.id} className="rounded-lg border border-slate-200 bg-slate-50/60 p-3">
+          <div
+            key={x.id}
+            id={`item-${x.id}`}
+            className="rounded-lg border border-slate-200 bg-slate-50/60 p-3"
+          >
             <div className="mb-2 flex items-center justify-between">
               <span className="text-xs font-semibold text-slate-500">{x.name || "New reference"}</span>
               <ItemControls
@@ -442,11 +474,13 @@ export default function EditorPanel({
         ))}
         <Button
           variant="primary"
-          onClick={() =>
+          onClick={() => {
+            const id = uid();
             patch((d) =>
-              d.references.push({ id: uid(), name: "", role: "", company: "", phone: "", email: "" } as Reference),
-            )
-          }
+              d.references.push({ id, name: "", role: "", company: "", phone: "", email: "" } as Reference),
+            );
+            reveal(id);
+          }}
         >
           + Add reference
         </Button>

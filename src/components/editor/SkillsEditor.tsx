@@ -13,6 +13,13 @@ function move<T>(arr: T[], from: number, to: number) {
   arr.splice(to, 0, item);
 }
 
+/** Bring a newly appended row into view; the list can run past the fold. */
+function reveal(id: string) {
+  setTimeout(() => {
+    document.getElementById(`item-${id}`)?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }, 0);
+}
+
 /** Clickable 1–5 rating. Clicking the active value clears it back to unrated. */
 function Rating({ value, onChange }: { value: number | null; onChange: (v: number | null) => void }) {
   const [hover, setHover] = useState<number | null>(null);
@@ -121,6 +128,7 @@ export default function SkillsEditor({ r, patch }: { r: Resume; patch: Patch }) 
       {r.skills.map((s, i) => (
         <div
           key={s.id}
+          id={`item-${s.id}`}
           className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50/60 p-2"
         >
           <input
@@ -146,7 +154,11 @@ export default function SkillsEditor({ r, patch }: { r: Resume; patch: Patch }) 
       <div className="flex flex-wrap gap-2 pt-1">
         <Button
           variant="primary"
-          onClick={() => patch((d) => d.skills.push({ id: uid(), name: "", level: null } as Skill))}
+          onClick={() => {
+            const id = uid();
+            patch((d) => d.skills.push({ id, name: "", level: null } as Skill));
+            reveal(id);
+          }}
         >
           + Add skill
         </Button>
