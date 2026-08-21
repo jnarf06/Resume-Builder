@@ -119,6 +119,47 @@ export const SAMPLE: Resume = {
       email: "",
     },
   ],
+  custom: [
+    {
+      id: "cs1",
+      title: "Certifications",
+      layout: "bullets",
+      bullets: [
+        "Google Ads Search Certification — 2024",
+        "Google Analytics 4 Certification — 2024",
+        "Meta Blueprint: Media Buying Professional — 2023",
+      ],
+      text: "",
+      entries: [],
+      placement: "side",
+      color: "",
+    },
+    {
+      id: "cs2",
+      title: "Seminars & Trainings",
+      layout: "entries",
+      bullets: [],
+      text: "",
+      entries: [
+        {
+          id: "ce1",
+          title: "Performance Marketing Summit",
+          subtitle: "Philippine Marketing Association",
+          date: "2024",
+          detail: "Two-day workshop on incrementality testing and media mix modelling.",
+        },
+        {
+          id: "ce2",
+          title: "Leading Technical Teams",
+          subtitle: "Ateneo Center for Continuing Education",
+          date: "2023",
+          detail: "",
+        },
+      ],
+      placement: "main",
+      color: "",
+    },
+  ],
   declaration:
     "I hereby declare that all the information provided is true, accurate, and complete to the best of my knowledge.",
 };
@@ -146,6 +187,7 @@ export const BLANK: Resume = {
   education: [{ id: "b2", school: "", course: "", level: "Tertiary", year: "" }],
   languages: [],
   references: [],
+  custom: [],
   declaration: SAMPLE.declaration,
 };
 
@@ -281,6 +323,18 @@ export const MOCK: Resume = {
   ],
   references: [
     { id: "mr1", name: "Carlos Lim", role: "Director of Operations", company: "Meridian", phone: "", email: "" },
+  ],
+  custom: [
+    {
+      id: "mc1",
+      title: "Certifications",
+      layout: "bullets",
+      bullets: ["Lean Six Sigma Green Belt", "COPC Customer Experience"],
+      text: "",
+      entries: [],
+      placement: "side",
+      color: "",
+    },
   ],
   declaration: SAMPLE.declaration,
 };

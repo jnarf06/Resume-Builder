@@ -657,6 +657,83 @@ export function Declaration({ r, t }: Ctx) {
   );
 }
 
+/**
+ * User-defined sections, filtered to one column. `placement` decides whether a
+ * section belongs in the sidebar or the main flow; single-column engines ask
+ * for both so nothing is ever silently dropped.
+ */
+export function CustomSections({
+  r,
+  t,
+  placement,
+  from = 1,
+}: Ctx & { placement: "main" | "side" | "all"; from?: number }) {
+  const list = r.custom.filter(
+    (c) => placement === "all" || c.placement === placement,
+  );
+  if (!list.length) return null;
+
+  let n = from;
+  return (
+    <>
+      {list.map((c) => {
+        const tt = c.color ? { ...t, accent: c.color } : t;
+        const hasBody =
+          (c.layout === "bullets" && c.bullets.some((b) => b.trim())) ||
+          (c.layout === "text" && c.text.trim()) ||
+          (c.layout === "entries" && c.entries.length > 0);
+        if (!c.title.trim() && !hasBody) return null;
+
+        return (
+          <section key={c.id} className="avoid-break" style={{ marginBottom: sectionGap(t) }}>
+            <SectionHead t={tt} index={n++}>
+              {c.title || "Untitled section"}
+            </SectionHead>
+
+            {c.layout === "text" && (
+              <p className="text-justify" style={{ fontSize: "0.96em" }}>
+                {c.text}
+              </p>
+            )}
+
+            {c.layout === "bullets" && (
+              <ul style={{ fontSize: "0.96em" }}>
+                {c.bullets
+                  .filter((b) => b.trim())
+                  .map((b, i) => (
+                    <li key={i} className="flex" style={{ marginBottom: "0.22em" }}>
+                      <Bullet t={tt} />
+                      <span>{b}</span>
+                    </li>
+                  ))}
+              </ul>
+            )}
+
+            {c.layout === "entries" && (
+              <div style={{ fontSize: "0.96em" }}>
+                {c.entries.map((e) => (
+                  <div key={e.id} className="avoid-break" style={{ marginBottom: itemGap(t) }}>
+                    <div className="flex items-baseline justify-between gap-[1em]">
+                      <span style={{ fontWeight: 700 }}>{e.title}</span>
+                      {e.date && (
+                        <span className="shrink-0" style={{ fontSize: "0.92em", color: t.muted }}>
+                          {e.date}
+                        </span>
+                      )}
+                    </div>
+                    {e.subtitle && <p style={{ color: t.muted }}>{e.subtitle}</p>}
+                    {e.detail && <p className="text-justify">{e.detail}</p>}
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+        );
+      })}
+    </>
+  );
+}
+
 /** Everything that normally lives in a sidebar, in one call. */
 export function SideSections({ r, t, from = 1 }: Ctx & { from?: number }) {
   let n = from;
@@ -685,6 +762,7 @@ export function SideSections({ r, t, from = 1 }: Ctx & { from?: number }) {
           <References r={r} t={t} />
         </Section>
       )}
+      <CustomSections r={r} t={t} placement="side" from={n} />
     </>
   );
 }

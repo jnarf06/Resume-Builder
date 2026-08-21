@@ -11,6 +11,7 @@ import { Accordion, Button, ItemControls, Select, Text, TextArea, Toggle } from 
 import ColorPicker from "./ColorPicker";
 import SkillsEditor from "./SkillsEditor";
 import SectionColor from "./SectionColor";
+import CustomSectionsEditor from "./CustomSectionsEditor";
 
 type Patch = (fn: (draft: Resume) => void) => void;
 
@@ -502,6 +503,11 @@ export default function EditorPanel({
         ))}
 
         <SectionColor r={r} patch={patch} id="references" />
+      </Accordion>
+
+      {/* ------------------------------------------------ custom */}
+      <Accordion title="Custom sections" count={r.custom.length}>
+        <CustomSectionsEditor r={r} patch={patch} />
       </Accordion>
 
       {/* ------------------------------------------------ declaration */}

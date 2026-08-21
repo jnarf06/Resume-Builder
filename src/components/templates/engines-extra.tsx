@@ -2,6 +2,7 @@ import type { Resume } from "@/lib/types";
 import type { TemplateSpec, Tokens } from "@/lib/templates/types";
 import {
   Contact,
+  CustomSections,
   Declaration,
   Decoration,
   Education,
@@ -65,6 +66,7 @@ export function WaveEngine({ r, t }: EngineProps) {
               <Experience r={r} t={t} />
             </Section>
           )}
+          <CustomSections r={r} t={t} placement="main" from={3} />
           <Declaration r={r} t={t} />
         </main>
       </div>
@@ -144,6 +146,12 @@ export function ModularEngine({ r, t }: EngineProps) {
         )}
       </div>
 
+      {r.custom.length > 0 && (
+        <div style={block(false)}>
+          <CustomSections r={r} t={t} placement="all" from={7} />
+        </div>
+      )}
+
       <Declaration r={r} t={t} />
     </div>
   );
@@ -176,6 +184,7 @@ export function EditorialEngine({ r, t }: EngineProps) {
               <Experience r={r} t={t} />
             </Section>
           )}
+          <CustomSections r={r} t={t} placement="main" from={7} />
         </main>
         <aside className="shrink-0" style={{ width: `${t.sidebarWidth}%` }}>
           {showPhoto && (
@@ -203,6 +212,7 @@ export function EditorialEngine({ r, t }: EngineProps) {
               <References r={r} t={t} />
             </Section>
           )}
+          <CustomSections r={r} t={t} placement="side" from={9} />
         </aside>
       </div>
       <Declaration r={r} t={t} />
@@ -283,6 +293,7 @@ export function MemphisEngine({ r, t }: EngineProps) {
             <References r={r} t={t} />
           </Section>
         )}
+        <CustomSections r={r} t={t} placement="all" from={7} />
       </div>
       <Declaration r={r} t={t} />
     </div>
@@ -363,6 +374,7 @@ export function SplitEngine({ r, t }: EngineProps) {
               <References r={r} t={onField} />
             </Section>
           )}
+          <CustomSections r={r} t={onField} placement="all" from={7} />
         </div>
         <Declaration r={r} t={onField} />
       </div>

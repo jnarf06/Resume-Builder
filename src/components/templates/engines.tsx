@@ -3,6 +3,7 @@ import type { Resume } from "@/lib/types";
 import type { TemplateSpec, Tokens } from "@/lib/templates/types";
 import {
   Contact,
+  CustomSections,
   Declaration,
   Education,
   Experience,
@@ -71,6 +72,7 @@ function MainSections({
           <References r={r} t={t} />
         </Section>
       )}
+      <CustomSections r={r} t={t} placement="all" from={n + 1} />
     </>
   );
 }
@@ -119,6 +121,7 @@ export function SidebarEngine({ r, t, spec }: EngineProps) {
               <Experience r={r} t={t} />
             </Section>
           )}
+          <CustomSections r={r} t={t} placement="main" from={sideCount + 3} />
           <Declaration r={r} t={t} />
         </main>
         {right && aside}
@@ -288,6 +291,11 @@ export function CardsEngine({ r, t }: EngineProps) {
           </div>
         </Card>
       )}
+      {r.custom.length > 0 && (
+        <Card t={t}>
+          <CustomSections r={r} t={t} placement="all" from={7} />
+        </Card>
+      )}
       <Declaration r={r} t={t} />
     </div>
   );
@@ -364,6 +372,7 @@ export function CompactEngine({ r, t }: EngineProps) {
         )}
       </div>
 
+      <CustomSections r={r} t={t} placement="all" from={7} />
       <Declaration r={r} t={t} />
     </div>
   );

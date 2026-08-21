@@ -98,6 +98,7 @@ export function migrate(r: Resume): Resume {
     experience: Array.isArray(r.experience)
       ? r.experience.map((e) => ({ ...e, location: e.location ?? "" }))
       : [],
+    custom: Array.isArray(r.custom) ? r.custom : [],
   };
 }
 
@@ -174,6 +175,7 @@ export function withSampleContent(r: Resume): Resume {
     education: s.education,
     languages: s.languages,
     references: s.references,
+    custom: s.custom,
     declaration: s.declaration,
     updatedAt: Date.now(),
   };

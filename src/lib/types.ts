@@ -40,6 +40,39 @@ export type Language = { id: string; name: string; level: string };
  */
 export type Skill = { id: string; name: string; level: number | null };
 
+/** One row in a custom section using the "entries" layout. */
+export type CustomEntry = {
+  id: string;
+  title: string;
+  subtitle: string;
+  date: string;
+  detail: string;
+};
+
+/**
+ * A section the user invents: Certifications, Seminars & Trainings, Eligibility,
+ * Awards, Projects, Volunteer Work — whatever the built-in sections do not cover.
+ * Three layouts handle nearly everything people actually add.
+ */
+export type CustomSection = {
+  id: string;
+  title: string;
+  layout: "bullets" | "text" | "entries";
+  bullets: string[];
+  text: string;
+  entries: CustomEntry[];
+  /** Two-column templates can take it in the sidebar instead of the main column. */
+  placement: "main" | "side";
+  /** Own heading colour; empty means follow the document accent. */
+  color: string;
+};
+
+export const CUSTOM_LAYOUTS: { value: CustomSection["layout"]; label: string; hint: string }[] = [
+  { value: "bullets", label: "Bullet list", hint: "Certifications, awards, eligibility" },
+  { value: "text", label: "Paragraph", hint: "A short statement or objective" },
+  { value: "entries", label: "Dated entries", hint: "Trainings, projects, seminars" },
+];
+
 export type Reference = {
   id: string;
   name: string;
@@ -123,6 +156,7 @@ export type Resume = {
   education: Education[];
   languages: Language[];
   references: Reference[];
+  custom: CustomSection[];
   declaration: string;
 };
 

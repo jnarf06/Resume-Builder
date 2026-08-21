@@ -131,6 +131,24 @@ gallery toward templates whose tone suits that field — conservative shapes for
 and legal, denser ones for maritime service records, warmer ones for retail and
 hospitality. Any template works with any resume.
 
+## Custom sections
+
+Built-in sections do not cover everything a Philippine resume needs — Seminars &
+Trainings, Eligibility, Certifications, Affiliations. `custom: CustomSection[]` lets a
+user invent their own, with three layouts:
+
+| Layout | For |
+| --- | --- |
+| `bullets` | Certifications, awards, eligibility |
+| `text` | A short statement or objective |
+| `entries` | Dated rows: title, organisation, date, optional detail |
+
+Each section carries a `placement` (`main` or `side`) and its own optional heading colour.
+`CustomSections` in `primitives.tsx` filters by placement and renders the right layout;
+every engine calls it, so a custom section appears in all 77 templates. Single-column
+engines ask for `placement: "all"` so a section marked for a sidebar is never silently
+dropped on a template that has none — the editor says so explicitly when that happens.
+
 ## No accounts, by design
 
 There is no login and no user identity. Resumes are keyed to the browser they were made
