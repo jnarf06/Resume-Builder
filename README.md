@@ -79,8 +79,13 @@ page to a dark ground with reversed-out type.
 
 Five roles can be overridden per resume, each independently: **accent** (headings, rules,
 bullets, banner fills), **panel** (sidebar and card tint), **page**, **body text**, and
-**on accent** (text over a filled area). Each has a native colour input plus twelve
-presets.
+**on accent** (text over a filled area).
+
+Every colour control in the app is one component, `ColorField.tsx`, offering three ways in:
+a swatch grid of 15 hues × 5 steps plus 7 neutrals, a **hex input** (accepts `#abc`,
+`abc`, `#1F3A5F`, with whitespace, and rejects anything else without clobbering the current
+colour), and the OS colour picker for the full spectrum. The current value is always shown
+as a hex code next to the label.
 
 A role left unset follows the template, so switching designs still changes the whole look;
 only the roles you overrode stay put. `resolveTokens()` in `Renderer.tsx` layers
