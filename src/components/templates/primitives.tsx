@@ -362,6 +362,9 @@ export function Photo({ r, t, size = "9em" }: Ctx & { size?: string }) {
         height: size,
         borderRadius: radius,
         objectFit: "cover",
+        // Bias the crop upwards: in a headshot the face sits above centre, and
+        // a centred crop takes the top of the head off.
+        objectPosition: "50% 25%",
         display: "block",
         border: t.photoFrame === "plain" ? `3px solid ${t.accent}` : undefined,
       }}

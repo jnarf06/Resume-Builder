@@ -280,6 +280,10 @@ function Editor() {
           <button
             type="button"
             onClick={() => window.print()}
+            title={
+              "In the print dialog: choose Save as PDF, leave Margins on Default, " +
+              "and tick Background graphics so the coloured panels are kept."
+            }
             className="rounded-md bg-slate-800 px-3 py-1.5 text-xs font-semibold text-white hover:bg-slate-700"
           >
             Download PDF

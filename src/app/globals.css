@@ -25,9 +25,21 @@ body {
 }
 
 @media print {
+  /*
+   * Vertical margin on every page so text never touches the paper edge, and
+   * none horizontally so sidebars and header bands still bleed to the sides.
+   * The first page keeps a flush top edge — that is where the coloured header
+   * band lives, and a white strip above it looks like a mistake.
+   *
+   * Chrome's own Margins dropdown overrides these: leave it on "Default".
+   */
   @page {
     size: A4;
-    margin: 0;
+    margin: 14mm 0;
+  }
+
+  @page :first {
+    margin-top: 0;
   }
 
   /* Backgrounds and the accent bar are the design — without this Chrome drops
@@ -61,5 +73,27 @@ body {
     width: 210mm !important;
     margin: 0 !important;
     box-shadow: none !important;
+  }
+
+  /*
+   * A heading stranded at the foot of a page with its content overleaf is the
+   * most common way a generated resume looks broken.
+   */
+  .resume-doc h2,
+  .resume-doc h3 {
+    break-after: avoid-page;
+    page-break-after: avoid;
+  }
+
+  /* No single dangling line of a paragraph across a page break. */
+  .resume-doc p,
+  .resume-doc li {
+    orphans: 3;
+    widows: 3;
+  }
+
+  /* The photo must never be split across a page boundary. */
+  .resume-doc img {
+    break-inside: avoid;
   }
 }

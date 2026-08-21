@@ -82,11 +82,20 @@ function MainSections({
 /** Tinted column beside the main content. Two columns: looks good, parses worse. */
 export function SidebarEngine({ r, t, spec }: EngineProps) {
   const right = spec.side === "right";
+
+  /*
+   * The sidebar tint is painted as a stripe on the document root rather than as
+   * a background on the <aside>. Chrome does not repeat a flex item's
+   * background across page fragments, so on a two-page resume the tint stopped
+   * at the foot of page one and the sidebar sat on bare white after that. A
+   * background on the root block does repeat.
+   */
+  const stripe = right
+    ? `linear-gradient(to right, transparent 0 ${100 - t.sidebarWidth}%, ${t.surface} ${100 - t.sidebarWidth}% 100%)`
+    : `linear-gradient(to right, ${t.surface} 0 ${t.sidebarWidth}%, transparent ${t.sidebarWidth}% 100%)`;
+
   const aside = (
-    <aside
-      className="shrink-0"
-      style={{ width: `${t.sidebarWidth}%`, backgroundColor: t.surface, padding: "2em 1.6em" }}
-    >
+    <aside className="shrink-0" style={{ width: `${t.sidebarWidth}%`, padding: "2em 1.6em" }}>
       {t.photo !== "none" && r.settings.showPhoto && (
         <div className="mb-[1.6em] flex justify-center">
           <Photo r={r} t={t} />
@@ -104,7 +113,7 @@ export function SidebarEngine({ r, t, spec }: EngineProps) {
     (r.settings.showReferences && r.references.length > 0 ? 1 : 0);
 
   return (
-    <div style={docStyle(t)}>
+    <div style={{ ...docStyle(t), backgroundImage: stripe }}>
       <header style={{ backgroundColor: t.accent, padding: "1.8em 2em" }}>
         <Name r={r} t={t} align={right ? "left" : "right"} onAccent />
       </header>

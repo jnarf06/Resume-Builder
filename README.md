@@ -189,8 +189,22 @@ Dates parse from `"Jul 2020"`, `"July 2020"` or `"2020"`; `"Present"` resolves t
 ## PDF export
 
 **Download PDF** calls `window.print()`. In the browser dialog choose *Save as PDF*,
-set margins to **None** and tick **Background graphics** — the accent bar and sidebar
-tint are backgrounds, and Chrome drops them otherwise.
+leave **Margins on Default**, and tick **Background graphics** — the accent bar and
+sidebar tint are backgrounds, and Chrome drops them otherwise.
+
+Margins must stay on *Default* because the page margins are set in CSS and Chrome's
+dropdown overrides them. `@page` takes `14mm 0`: vertical breathing room on every page,
+nothing horizontal so sidebars and header bands still bleed to the paper edge.
+`@page :first` drops the top margin so the coloured header band starts flush.
+
+Two multi-page problems are handled explicitly:
+
+- **The sidebar tint used to stop after page one.** Chrome does not repeat a flex item's
+  background across page fragments, so the `<aside>` painted only on its first fragment.
+  `SidebarEngine` now draws the tint as a `linear-gradient` stripe on the document root —
+  a block-level background, which does repeat.
+- **Headings stranded at the foot of a page** are prevented with `break-after: avoid-page`
+  on `h2`/`h3`, and `orphans: 3; widows: 3` stops a single dangling line of a paragraph.
 
 Print rules live at the bottom of `src/app/globals.css`. `.no-print` hides the app
 chrome, `.avoid-break` keeps a job entry from splitting across pages, and the overflow

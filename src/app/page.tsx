@@ -479,7 +479,7 @@ function Faq() {
     },
     {
       q: "How do I get a PDF?",
-      a: "Download PDF opens your browser's print dialog — choose Save as PDF, set margins to None, and tick Background graphics so the coloured panels are not dropped.",
+      a: "Download PDF opens your browser's print dialog — choose Save as PDF, leave Margins on Default, and tick Background graphics so the coloured panels are not dropped. The page margins are set in the stylesheet, and Chrome's Margins dropdown overrides them if you change it.",
     },
     {
       q: "Can I keep more than one resume?",
