@@ -332,17 +332,12 @@ export function Photo({ r, t, size = "9em" }: Ctx & { size?: string }) {
 
   const radius =
     t.photoFrame === "arch"
-      ? `${size} ${size} 0.6em 0.6em`
+      ? "999px 999px 0.6em 0.6em"
       : t.photo === "circle"
         ? "9999px"
         : t.photo === "rounded"
           ? "0.8em"
           : "0";
-
-  const frame: CSSProperties =
-    t.photoFrame === "framed"
-      ? { padding: "0.5em", backgroundColor: t.dark ? tint(t.accent, 0.25) : "#ffffff", borderRadius: radius }
-      : {};
 
   const initials =
     r.basics.fullName
@@ -352,41 +347,60 @@ export function Photo({ r, t, size = "9em" }: Ctx & { size?: string }) {
       .map((w) => w[0]?.toUpperCase())
       .join("") || "—";
 
-  const inner = r.basics.photo ? (
+  /*
+   * The image is clipped by an overflow:hidden wrapper rather than by
+   * border-radius on the <img> itself. Chrome drops radius clipping on
+   * replaced elements when printing, which left a square photo sitting inside
+   * a floating curved border. Clipping on a plain block survives print.
+   */
+  const clip: CSSProperties = {
+    width: size,
+    aspectRatio: "1 / 1",
+    borderRadius: radius,
+    overflow: "hidden",
+    border: t.photoFrame === "plain" ? `3px solid ${t.accent}` : undefined,
+    flexShrink: 0,
+  };
+
+  const body = r.basics.photo ? (
     // eslint-disable-next-line @next/next/no-img-element
     <img
       src={r.basics.photo}
       alt=""
       style={{
-        width: size,
-        height: size,
-        borderRadius: radius,
+        width: "100%",
+        height: "100%",
         objectFit: "cover",
         // Bias the crop upwards: in a headshot the face sits above centre, and
         // a centred crop takes the top of the head off.
         objectPosition: "50% 25%",
         display: "block",
-        border: t.photoFrame === "plain" ? `3px solid ${t.accent}` : undefined,
       }}
     />
   ) : (
     <div
-      className="flex items-center justify-center"
-      style={{
-        width: size,
-        height: size,
-        borderRadius: radius,
-        backgroundColor: t.accent,
-        color: t.onAccent,
-        fontSize: "1.6em",
-        fontWeight: 700,
-      }}
+      className="flex h-full w-full items-center justify-center"
+      style={{ backgroundColor: t.accent, color: t.onAccent, fontSize: "1.6em", fontWeight: 700 }}
     >
       {initials}
     </div>
   );
 
-  return t.photoFrame === "framed" ? <div style={frame}>{inner}</div> : inner;
+  const framed = t.photoFrame === "framed";
+  return framed ? (
+    <div
+      style={{
+        padding: "0.5em",
+        backgroundColor: t.dark ? tint(t.accent, 0.25) : "#ffffff",
+        borderRadius: radius,
+        flexShrink: 0,
+      }}
+    >
+      <div style={clip}>{body}</div>
+    </div>
+  ) : (
+    <div style={clip}>{body}</div>
+  );
 }
 
 export function Contact({ r, t, layout = "list" }: Ctx & { layout?: "list" | "inline" | "grid" }) {

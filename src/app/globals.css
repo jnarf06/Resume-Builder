@@ -59,9 +59,16 @@ body {
     display: none !important;
   }
 
-  /* Unwind the app chrome: the editor lives inside fixed-height, scrolling
-     flex containers, and anything clipped by overflow is clipped in print. */
-  body * {
+  /*
+   * Unwind the app chrome: the editor lives inside fixed-height, scrolling
+   * flex containers, and anything clipped by overflow is clipped in print.
+   *
+   * Scoped to exclude the document itself. The blanket version also stripped
+   * the clipping the resume *relies* on — the round photo frame, the meter
+   * bars, and the geometric decoration — so a circular portrait printed as a
+   * square image with a curved border floating around it.
+   */
+  body *:not(.resume-doc):not(.resume-doc *) {
     overflow: visible !important;
   }
 

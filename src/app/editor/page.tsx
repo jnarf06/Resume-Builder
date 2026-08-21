@@ -16,6 +16,7 @@ import {
 import { useLibrary } from "@/lib/useLibrary";
 import { buildShareLink, copyToClipboard, decodeResume, takeSharePayload } from "@/lib/share";
 import { StorageBanner } from "@/components/Banners";
+import PrintDialog, { shouldShowPrintTips } from "@/components/PrintDialog";
 import { auditResume } from "@/lib/audit";
 import EditorPanel from "@/components/editor/EditorPanel";
 import AuditPanel from "@/components/AuditPanel";
@@ -45,6 +46,7 @@ function Editor() {
   const [tab, setTab] = useState<Tab>("edit");
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [shareNote, setShareNote] = useState("");
+  const [printTips, setPrintTips] = useState(false);
   const importRef = useRef<HTMLInputElement>(null);
 
   // Open whichever resume the dashboard linked to; fall back to the first one.
@@ -279,10 +281,14 @@ function Editor() {
           </span>
           <button
             type="button"
-            onClick={() => window.print()}
+            onClick={() => {
+              // The browser owns the print options, so all we can do is remind.
+              if (shouldShowPrintTips()) setPrintTips(true);
+              else window.print();
+            }}
             title={
-              "In the print dialog: choose Save as PDF, leave Margins on Default, " +
-              "and tick Background graphics so the coloured panels are kept."
+              "Print dialog: Save as PDF, Margins on Default, Background graphics ticked, " +
+              "Headers and footers unticked."
             }
             className="rounded-md bg-slate-800 px-3 py-1.5 text-xs font-semibold text-white hover:bg-slate-700"
           >
@@ -326,6 +332,8 @@ function Editor() {
           </div>
         </div>
       </div>
+
+      {printTips && <PrintDialog onClose={() => setPrintTips(false)} />}
 
       {galleryOpen && (
         <TemplateGallery
